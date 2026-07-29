@@ -142,6 +142,8 @@ KEY_LABELS = {
     "ArrowUp": "ArrowUp", "ArrowDown": "ArrowDown",
     "ArrowLeft": "ArrowLeft", "ArrowRight": "ArrowRight",
 }
+# Function keys label as F1..F12, not as the private-use character they emit.
+KEY_LABELS.update({"F%d" % n: "F%d" % n for n in _FN_CODES})
 
 # NSEvent/CGEvent modifier masks OR'd with the left-hand device-dependent bit,
 # exactly as Options+ writes them. Verified against real profiles:
@@ -675,7 +677,10 @@ def _build_ict(title: str, icon_path: str | None, color: int, text_color: int,
             })
         text_area = {"x": 0, "y": 72, "width": 100, "height": 24, "isFullScreen": False}
     else:
-        text_area = {"x": 0, "y": 34, "width": 100, "height": 32, "isFullScreen": False}
+        # Text sits below the glyph when there is one, so the two do not overlap
+        # in the 100x100 icon coordinate space.
+        text_area = {"x": 0, "y": 58 if glyph else 34, "width": 100,
+                     "height": 30 if glyph else 32, "isFullScreen": False}
         if glyph:
             items.append({
                 "$type": T_ICON_TEXT,

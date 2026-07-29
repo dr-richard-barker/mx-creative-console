@@ -144,13 +144,13 @@ Object.assign(KEY_TABLE, {
   Return: [36, "\r", 0],
   Tab: [48, "\t", 0],
   Space: [49, " ", 0],
-  Escape: [53, "", 0],
+  Escape: [53, "\u001b", 0],
   Backspace: [51, "\b", 0],
-  Delete: [117, "", FLAG_FUNCTION],
-  ArrowUp: [126, "", FLAG_FUNCTION | FLAG_NUMPAD],
-  ArrowDown: [125, "", FLAG_FUNCTION | FLAG_NUMPAD],
-  ArrowLeft: [123, "", FLAG_FUNCTION | FLAG_NUMPAD],
-  ArrowRight: [124, "", FLAG_FUNCTION | FLAG_NUMPAD],
+  Delete: [117, "\uf728", FLAG_FUNCTION],
+  ArrowUp: [126, "\uf700", FLAG_FUNCTION | FLAG_NUMPAD],
+  ArrowDown: [125, "\uf701", FLAG_FUNCTION | FLAG_NUMPAD],
+  ArrowLeft: [123, "\uf702", FLAG_FUNCTION | FLAG_NUMPAD],
+  ArrowRight: [124, "\uf703", FLAG_FUNCTION | FLAG_NUMPAD],
   Minus: [27, "-", 0],
   Equals: [24, "=", 0],
   Period: [47, ".", 0],
@@ -167,6 +167,8 @@ const KEY_LABELS = {
   Backspace: "Backspace", Delete: "Delete", ArrowUp: "ArrowUp",
   ArrowDown: "ArrowDown", ArrowLeft: "ArrowLeft", ArrowRight: "ArrowRight",
 };
+// Function keys label as F1..F12, not as the private-use character they emit.
+for (const n of Object.keys(FNKEYS)) KEY_LABELS["F" + n] = "F" + n;
 
 const MOD_MASKS = {
   cmd: 0x100000 | 0x000008,
@@ -585,8 +587,10 @@ function buildIct(meta) {
     fontName: "Brown Logitech Pan Light",
     isVisible: true,
     itemType: "Text",
+    // Text sits below the glyph when there is one, so the two do not overlap
+    // in the 100x100 icon coordinate space.
     area: meta.glyph
-      ? { x: 0, y: 72, width: 100, height: 24, isFullScreen: false }
+      ? { x: 0, y: 58, width: 100, height: 30, isFullScreen: false }
       : { x: 0, y: 34, width: 100, height: 32, isFullScreen: false },
   });
   return { backgroundColor: hexToArgb(meta.color), items };
