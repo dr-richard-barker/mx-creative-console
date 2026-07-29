@@ -175,21 +175,54 @@ footer { padding: 32px 0 60px; color: var(--muted); font-size: 14px; }
 footer .tip { max-width: 64ch; margin: 0 0 18px; }
 footer .tip-note { display: block; margin-top: 4px; font-size: 12.5px; opacity: .75; }
 
-/* ---- dial editor ---- */
+/* ---- device shells ----
+   Proportions traced from Logitech's own labelled diagram of the hardware,
+   so the builder matches what is actually under your hands. */
 
-.dials { display: flex; gap: 10px; margin-top: 12px; }
-.dial {
-  flex: 1; border-radius: 999px; aspect-ratio: 1; border: 2px solid var(--line);
-  background: var(--panel); color: var(--fg); display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 2px; cursor: pointer;
-  text-align: center; padding: 6px; font-family: inherit; outline: 2px solid transparent;
-  outline-offset: 2px; transition: outline-color .12s;
+.device {
+  position: relative;
+  background: #303338;
+  border: 1px solid #1c1e22;
+  border-radius: 16px;
+  padding: 10px;
+  width: 100%;
+  max-width: 250px;
 }
-.dial:hover { outline-color: var(--muted); }
-.dial[aria-current="true"] { outline-color: var(--accent); }
-.dial .dial-title { font-size: 10.5px; font-weight: 600; line-height: 1.15; word-break: break-word; }
-.dial .dial-sub { font-size: 9px; opacity: .7; font-family: var(--mono); }
-.dial.empty { border-style: dashed; color: var(--muted); }
+.device-keypad { padding: 12px; }
+.device-dialpad { aspect-ratio: 386 / 327; padding: 0; }
+
+.device .ctrl {
+  position: absolute;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; overflow: hidden;
+  border: 0; padding: 2px; cursor: pointer;
+  font-family: inherit; color: #fff;
+  background: #4a4e55;
+  outline: 2px solid transparent; outline-offset: 2px;
+  transition: outline-color .12s;
+}
+.device .ctrl.round { border-radius: 50%; }
+.device .ctrl.roller { border-radius: 5px; background: #23262a; border: 1px solid #55595f; }
+.device .ctrl:hover { outline-color: rgba(255, 255, 255, .55); }
+.device .ctrl[aria-current="true"] { outline-color: var(--accent); }
+.device .ctrl.unassigned { background: #3c4046; color: #9aa1ab; box-shadow: inset 0 0 0 1px #4e535a; }
+
+.device .ctrl .t { font-size: 8.5px; font-weight: 600; line-height: 1.1; word-break: break-word; }
+.device .ctrl .g { font-size: 15px; line-height: 1; }
+.device .ctrl.dial-main .t { font-size: 11px; }
+.device .ctrl.dial-main .g { font-size: 22px; }
+
+.device-caption {
+  font-size: 11.5px; color: var(--muted); margin: 6px 0 0; text-align: center;
+}
+
+.slot { border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.slot > h4 {
+  margin: 0 0 8px; font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.slot + .slot { margin-top: 10px; }
 
 .slot { border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
 .slot > h4 {

@@ -40,6 +40,33 @@ constants near the top of the file.
 | `Loupedeck70` | MX Creative **Keypad** | 9 (`controlId` 0&ndash;8, a 3&times;3 grid, top-left first) | 0 |
 | `Loupedeck71` | MX Creative **Dialpad** | 4 (`controlId` 0&ndash;3) | 2 (`controlId` 0&ndash;1) |
 
+### Which `controlId` is which physical control
+
+The dialpad's physical layout is: a pair of round buttons top-left, the roller
+top-right, one large dial in the centre, and a round button in each bottom
+corner.
+
+| Control | Hardware position | Default binding |
+|---|---|---|
+| press 0 | top-left, first of the pair | Undo |
+| press 1 | top-left, second of the pair | Redo |
+| press 2 | bottom-left | Escape |
+| press 3 | bottom-right | Show Actions Ring |
+| **rotate 0** | **the roller, top right** | System Volume |
+| **rotate 1** | **the big centre dial** | Contextual + Vertical Scroll |
+
+**The rotate mapping is the counter-intuitive one** &mdash; `rotate 0` is the small
+roller, not the large dial. Inferred from `Default General Profile_dialpad.lp5`,
+which binds `rotate 0` to `$DefaultMac___Volume` and `rotate 1` to Scroll,
+matching each control's hardware default. Getting this backwards puts your
+primary action on the small roller.
+
+The press mapping is inferred from the same profiles: ids 0 and 1 are always a
+natural pair (Back/Forward, `Cmd+[` / `Cmd+]`, Escape/Return), and id 3 is a
+profile switch in every shipped dialpad profile, matching the Actions Ring
+button. This is consistent across all of them but is inference, not documented
+fact.
+
 ## Layout tree
 
 ```

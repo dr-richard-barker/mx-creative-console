@@ -65,8 +65,41 @@ async function load() {
 
 /* ---------------- previews ---------------- */
 
+/*
+ * Device geometry, traced from Logitech's labelled hardware diagram.
+ * Values are percentages of the device body; circles derive their height from
+ * the body's aspect ratio so they stay round.
+ *
+ * Control-id mapping is inferred from the profiles Logitech ships:
+ *   press 0,1  the top-left pair   (Undo / Redo by default; always a pair -
+ *              Back/Forward, Cmd+[ / Cmd+], Escape/Return)
+ *   press 2    bottom-left         (Escape by default)
+ *   press 3    bottom-right        (Show Actions Ring; a profile switch in
+ *              every shipped profile)
+ *   rotate 0   the ROLLER, top right - the default profile binds it to
+ *              Volume, and System Volume is the roller's hardware default
+ *   rotate 1   the big centre dial - default Scroll, matching the dial's
+ *              "Contextual + Vertical Scroll" hardware label
+ */
+const DIALPAD_ASPECT = 386 / 327;
+const DIALPAD_GEOMETRY = {
+  buttons: [
+    { left: 2.0, top: 7.3, w: 12.0, hardware: "Undo" },
+    { left: 16.8, top: 6.7, w: 12.0, hardware: "Redo" },
+    { left: 2.0, top: 80.1, w: 13.0, hardware: "Escape" },
+    { left: 65.0, top: 80.1, w: 13.0, hardware: "Show Actions Ring" },
+  ],
+  dials: [
+    { left: 53.8, top: 7.7, w: 19.4, h: 12.8, roller: true, hardware: "Roller — System Volume" },
+    { left: 24.8, top: 33.4, w: 40.4, main: true, hardware: "Dial — Contextual + Vertical Scroll" },
+  ],
+};
+
+const hasSteps = (b) => !!(b && b.steps?.length);
+const dialBound = (d) => !!(d && (d.left?.length || d.right?.length || d.press?.length));
+
 function keyFace(button, opts = {}) {
-  if (!button || !button.steps?.length) {
+  if (!hasSteps(button)) {
     return el("div", { className: "key empty" }, opts.placeholder ?? "");
   }
   const node = el("div", { className: "key" });
@@ -76,13 +109,71 @@ function keyFace(button, opts = {}) {
   return node;
 }
 
-function devicePreview(spec) {
-  const dev = DEVICES[spec.device];
-  const grid = el("div", {
-    className: spec.device === "dialpad" ? "grid-dialpad" : "grid-keypad",
+/** One absolutely-positioned control on the dialpad body. */
+function dialpadCtrl(geo, { title, glyph, color, bound, extraClass = "" }) {
+  const node = el("div", {
+    className: `ctrl ${geo.roller ? "roller" : "round"} ${extraClass} ${bound ? "" : "unassigned"}`.trim(),
   });
-  for (let i = 0; i < dev.press; i++) grid.append(keyFace((spec.buttons || [])[i]));
-  return grid;
+  node.style.left = `${geo.left}%`;
+  node.style.top = `${geo.top}%`;
+  node.style.width = `${geo.w}%`;
+  node.style.height = geo.h ? `${geo.h}%` : `${geo.w * DIALPAD_ASPECT}%`;
+  if (bound && color) node.style.background = color;
+  node.title = geo.hardware;
+  if (glyph) node.append(el("span", { className: "g" }, glyph));
+  if (title) node.append(el("span", { className: "t" }, title));
+  return node;
+}
+
+/**
+ * Render a device body for `spec`. `interactive` wires up selection; the
+ * profile cards use the same renderer without it so previews and the builder
+ * can never drift apart.
+ */
+function deviceNode(spec, interactive = false) {
+  const dev = DEVICES[spec.device];
+  const buttons = spec.buttons || [];
+  const dials = spec.dials || [];
+
+  if (spec.device !== "dialpad") {
+    const body = el("div", { className: "device device-keypad" });
+    const grid = el("div", { className: "grid-keypad" });
+    grid.style.width = "100%";
+    for (let i = 0; i < dev.press; i++) {
+      const face = keyFace(buttons[i], { placeholder: String(i + 1) });
+      if (interactive) makeSelectable(face, "button", i);
+      grid.append(face);
+    }
+    body.append(grid);
+    return body;
+  }
+
+  const body = el("div", { className: "device device-dialpad" });
+  DIALPAD_GEOMETRY.buttons.forEach((geo, i) => {
+    const b = buttons[i];
+    const node = dialpadCtrl(geo, {
+      title: b?.title, glyph: b?.glyph, color: b?.color, bound: hasSteps(b),
+    });
+    if (interactive) makeSelectable(node, "button", i);
+    body.append(node);
+  });
+  DIALPAD_GEOMETRY.dials.forEach((geo, i) => {
+    const d = dials[i];
+    const node = dialpadCtrl(geo, {
+      title: d?.title,
+      glyph: dialBound(d) ? (geo.roller ? "↕" : "↻") : null,
+      color: d?.color,
+      bound: dialBound(d),
+      extraClass: geo.main ? "dial-main" : "",
+    });
+    if (interactive) makeSelectable(node, "dial", i);
+    body.append(node);
+  });
+  return body;
+}
+
+function devicePreview(spec) {
+  return deviceNode(spec, false);
 }
 
 /* ---------------- ready-made profile cards ---------------- */
@@ -221,60 +312,31 @@ const activateOnKey = (fn) => (e) => {
   }
 };
 
-function buttonNode(i) {
-  const node = keyFace(state.spec.buttons[i], { placeholder: String(i + 1) });
+function makeSelectable(node, kind, i) {
   node.setAttribute("role", "button");
   node.tabIndex = 0;
-  node.setAttribute("aria-current", String(isSelected("button", i)));
-  const pick = () => select("button", i);
+  node.setAttribute("aria-current", String(isSelected(kind, i)));
+  const pick = () => select(kind, i);
   node.addEventListener("click", pick);
   node.addEventListener("keydown", activateOnKey(pick));
-  return node;
 }
 
-function dialNode(i) {
-  const d = state.spec.dials[i];
-  const bound = !!(d && (d.left?.length || d.right?.length || d.press?.length));
-  const node = el("div", { className: bound ? "dial" : "dial empty" });
-  if (bound && d.color) node.style.borderColor = d.color;
-  node.append(el("span", { className: "dial-title" }, d?.title || `Dial ${i + 1}`));
-  node.append(el("span", { className: "dial-sub" }, bound ? "↺  ↻" : "unassigned"));
-  node.setAttribute("role", "button");
-  node.tabIndex = 0;
-  node.setAttribute("aria-current", String(isSelected("dial", i)));
-  const pick = () => select("dial", i);
-  node.addEventListener("click", pick);
-  node.addEventListener("keydown", activateOnKey(pick));
-  return node;
-}
+const HINTS = {
+  keypad: "9 LCD keys, top-left to bottom-right. Click one to edit it.",
+  dialpad:
+    "Laid out like the hardware: the Undo/Redo pair, the roller, the big dial, "
+    + "and the two corner buttons. Click any of them to edit.",
+};
 
 function renderBuilder() {
-  const dev = DEVICES[state.spec.device];
-
-  const grid = $("#device-grid");
-  grid.className = state.spec.device === "dialpad" ? "grid-dialpad" : "grid-keypad";
-  grid.replaceChildren();
-  for (let i = 0; i < dev.press; i++) grid.append(buttonNode(i));
-
-  const dialHost = $("#dial-row");
-  dialHost.replaceChildren();
-  dialHost.style.display = dev.rotate ? "flex" : "none";
-  for (let i = 0; i < dev.rotate; i++) dialHost.append(dialNode(i));
-
-  $("#grid-hint").textContent = dev.rotate
-    ? `${dev.press} buttons and ${dev.rotate} dials. Click any of them to edit.`
-    : `${dev.press} keys, top-left to bottom-right. Click one to edit it.`;
-
+  $("#device").replaceChildren(deviceNode(state.spec, true));
+  $("#grid-hint").textContent = HINTS[state.spec.device] || "";
   renderEditor();
 }
 
 /* Repaint the device only, so the editor keeps focus while you type. */
 function refreshFaces() {
-  const dev = DEVICES[state.spec.device];
-  const grid = [...$("#device-grid").children];
-  grid.forEach((node, i) => { if (i < dev.press) node.replaceWith(buttonNode(i)); });
-  const dials = [...$("#dial-row").children];
-  dials.forEach((node, i) => { if (i < dev.rotate) node.replaceWith(dialNode(i)); });
+  $("#device").replaceChildren(deviceNode(state.spec, true));
 }
 
 /* ---- editor ---- */

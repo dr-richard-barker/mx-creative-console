@@ -24,63 +24,114 @@
           "title": "Focus Claude",
           "glyph": "◉",
           "color": "#D97757",
-          "steps": [{ "key": "Tab", "mods": ["cmd"] }],
+          "steps": [
+            {
+              "key": "Tab",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
           "note": "Cmd+Tab jumps back to your previous app. Install the Claude Console plugin to upgrade this key into a real notification light that flashes when Claude needs you and focuses its window by name."
         },
         {
           "title": "Continue",
           "glyph": "⏎",
           "color": "#2D6A4F",
-          "steps": [{ "key": "Return" }],
+          "steps": [
+            {
+              "key": "Return"
+            }
+          ],
           "note": "Sends Return - accepts the highlighted choice or submits an empty prompt to let Claude carry on."
         },
         {
           "title": "Compact",
           "glyph": "≡",
           "color": "#186A6A",
-          "steps": [{ "text": "/compact" }, { "key": "Return" }],
+          "steps": [
+            {
+              "text": "/compact"
+            },
+            {
+              "key": "Return"
+            }
+          ],
           "note": "Summarises the conversation so far to free up context."
         },
         {
           "title": "Plan Mode",
           "glyph": "◳",
           "color": "#5B3FA8",
-          "steps": [{ "key": "Tab", "mods": ["shift"] }],
+          "steps": [
+            {
+              "key": "Tab",
+              "mods": [
+                "shift"
+              ]
+            }
+          ],
           "note": "Shift+Tab cycles permission modes: default, accept-edits, plan."
         },
         {
           "title": "Transcript",
           "glyph": "☷",
           "color": "#2A2E35",
-          "steps": [{ "key": "KeyO", "mods": ["ctrl"] }],
+          "steps": [
+            {
+              "key": "KeyO",
+              "mods": [
+                "ctrl"
+              ]
+            }
+          ],
           "note": "Ctrl+O expands the full tool-call transcript."
         },
         {
           "title": "Rewind",
           "glyph": "↺",
           "color": "#2A2E35",
-          "steps": [{ "key": "Escape" }, { "key": "Escape" }],
+          "steps": [
+            {
+              "key": "Escape"
+            },
+            {
+              "key": "Escape"
+            }
+          ],
           "note": "Double-Escape on an empty prompt opens the rewind/checkpoint menu."
         },
         {
           "title": "Deny",
           "glyph": "✕",
           "color": "#B3261E",
-          "steps": [{ "key": "Escape" }],
+          "steps": [
+            {
+              "key": "Escape"
+            }
+          ],
           "note": "Escape declines the prompt. Works whatever shape the dialog takes, which the number keys do not."
         },
         {
           "title": "Always Allow",
           "glyph": "2",
           "color": "#B26A00",
-          "steps": [{ "key": "Key2" }],
+          "steps": [
+            {
+              "key": "Key2"
+            }
+          ],
           "note": "Option 2 is 'Yes, and don't ask again'. Amber on purpose - this one grants standing permission."
         },
         {
           "title": "Allow Once",
           "glyph": "1",
           "color": "#1B7F3B",
-          "steps": [{ "key": "Key1" }],
+          "steps": [
+            {
+              "key": "Key1"
+            }
+          ],
           "note": "Option 1 is 'Yes'. Approves this single call."
         }
       ]
@@ -92,26 +143,108 @@
       "folder": "Dialpad/Claude",
       "description": "Slash commands and scrolling for a Claude Code session.",
       "buttons": [
-        { "title": "Clear", "glyph": "⊘", "color": "#B3261E", "steps": [{ "text": "/clear" }, { "key": "Return" }], "note": "Wipes the conversation and starts fresh." },
-        { "title": "Cost", "glyph": "¤", "color": "#B26A00", "steps": [{ "text": "/cost" }, { "key": "Return" }], "note": "Token spend for this session." },
-        { "title": "Diff", "glyph": "±", "color": "#1E4E8C", "steps": [{ "text": "/diff" }, { "key": "Return" }], "note": "Review the working diff." },
-        { "title": "Context", "glyph": "▦", "color": "#186A6A", "steps": [{ "text": "/context" }, { "key": "Return" }], "note": "Shows what is filling the context window." }
+        {
+          "title": "Clear",
+          "glyph": "⊘",
+          "color": "#B3261E",
+          "steps": [
+            {
+              "text": "/clear"
+            },
+            {
+              "key": "Return"
+            }
+          ],
+          "note": "Wipes the conversation and starts fresh."
+        },
+        {
+          "title": "Cost",
+          "glyph": "¤",
+          "color": "#B26A00",
+          "steps": [
+            {
+              "text": "/cost"
+            },
+            {
+              "key": "Return"
+            }
+          ],
+          "note": "Token spend for this session."
+        },
+        {
+          "title": "Diff",
+          "glyph": "±",
+          "color": "#1E4E8C",
+          "steps": [
+            {
+              "text": "/diff"
+            },
+            {
+              "key": "Return"
+            }
+          ],
+          "note": "Review the working diff."
+        },
+        {
+          "title": "Context",
+          "glyph": "▦",
+          "color": "#186A6A",
+          "steps": [
+            {
+              "text": "/context"
+            },
+            {
+              "key": "Return"
+            }
+          ],
+          "note": "Shows what is filling the context window."
+        }
       ],
       "dials": [
         {
-          "title": "Scroll",
-          "color": "#2A2E35",
-          "left": [{ "key": "ArrowUp" }],
-          "right": [{ "key": "ArrowDown" }],
-          "note": "Scroll back through the transcript."
-        },
-        {
           "title": "Switch Apps",
           "color": "#2A2E35",
-          "left": [{ "key": "Oem5", "mods": ["cmd", "shift"] }],
-          "right": [{ "key": "Oem5", "mods": ["cmd"] }],
-          "press": [{ "key": "Tab", "mods": ["cmd"] }],
+          "left": [
+            {
+              "key": "Oem5",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "right": [
+            {
+              "key": "Oem5",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "press": [
+            {
+              "key": "Tab",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
           "note": "Cycle windows of the current app; press to jump to the previous app."
+        },
+        {
+          "title": "Scroll",
+          "color": "#2A2E35",
+          "left": [
+            {
+              "key": "ArrowUp"
+            }
+          ],
+          "right": [
+            {
+              "key": "ArrowDown"
+            }
+          ],
+          "note": "Scroll back through the transcript."
         }
       ]
     },
@@ -122,15 +255,138 @@
       "folder": "Console/VS Code",
       "description": "Editor navigation, panels and search. Shortcuts are VS Code defaults on macOS and also match Cursor and Windsurf.",
       "buttons": [
-        { "title": "Command Palette", "glyph": "⌘", "color": "#1E4E8C", "steps": [{ "key": "KeyP", "mods": ["cmd", "shift"] }], "note": "The one to keep if you only keep one." },
-        { "title": "Quick Open", "glyph": "→", "color": "#1E4E8C", "steps": [{ "key": "KeyP", "mods": ["cmd"] }], "note": "Jump to any file by name." },
-        { "title": "Go to Symbol", "glyph": "ƒ", "color": "#1E4E8C", "steps": [{ "key": "KeyO", "mods": ["cmd", "shift"] }], "note": "Symbols in the current file." },
-        { "title": "Terminal", "glyph": "⌫", "color": "#2A2E35", "steps": [{ "key": "Oem5", "mods": ["ctrl"] }], "note": "Ctrl+backtick toggles the integrated terminal - where Claude Code usually lives." },
-        { "title": "Explorer", "glyph": "▤", "color": "#2A2E35", "steps": [{ "key": "KeyE", "mods": ["cmd", "shift"] }], "note": "File tree." },
-        { "title": "Source Control", "glyph": "⎇", "color": "#5B3FA8", "steps": [{ "key": "KeyG", "mods": ["ctrl", "shift"] }], "note": "VS Code binds Source Control to Ctrl+Shift+G on macOS, not Cmd." },
-        { "title": "Find in Files", "glyph": "⌕", "color": "#186A6A", "steps": [{ "key": "KeyF", "mods": ["cmd", "shift"] }], "note": "Search across the workspace." },
-        { "title": "Toggle Comment", "glyph": "//", "color": "#2A2E35", "steps": [{ "key": "Oem2", "mods": ["cmd"] }], "note": "Comment or uncomment the selection." },
-        { "title": "Format Doc", "glyph": "¶", "color": "#1B7F3B", "steps": [{ "key": "KeyF", "mods": ["alt", "shift"] }], "note": "Run the configured formatter over the whole file." }
+        {
+          "title": "Command Palette",
+          "glyph": "⌘",
+          "color": "#1E4E8C",
+          "steps": [
+            {
+              "key": "KeyP",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": "The one to keep if you only keep one."
+        },
+        {
+          "title": "Quick Open",
+          "glyph": "→",
+          "color": "#1E4E8C",
+          "steps": [
+            {
+              "key": "KeyP",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Jump to any file by name."
+        },
+        {
+          "title": "Go to Symbol",
+          "glyph": "ƒ",
+          "color": "#1E4E8C",
+          "steps": [
+            {
+              "key": "KeyO",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": "Symbols in the current file."
+        },
+        {
+          "title": "Terminal",
+          "glyph": "⌫",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "Oem5",
+              "mods": [
+                "ctrl"
+              ]
+            }
+          ],
+          "note": "Ctrl+backtick toggles the integrated terminal - where Claude Code usually lives."
+        },
+        {
+          "title": "Explorer",
+          "glyph": "▤",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "KeyE",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": "File tree."
+        },
+        {
+          "title": "Source Control",
+          "glyph": "⎇",
+          "color": "#5B3FA8",
+          "steps": [
+            {
+              "key": "KeyG",
+              "mods": [
+                "ctrl",
+                "shift"
+              ]
+            }
+          ],
+          "note": "VS Code binds Source Control to Ctrl+Shift+G on macOS, not Cmd."
+        },
+        {
+          "title": "Find in Files",
+          "glyph": "⌕",
+          "color": "#186A6A",
+          "steps": [
+            {
+              "key": "KeyF",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": "Search across the workspace."
+        },
+        {
+          "title": "Toggle Comment",
+          "glyph": "//",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "Oem2",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Comment or uncomment the selection."
+        },
+        {
+          "title": "Format Doc",
+          "glyph": "¶",
+          "color": "#1B7F3B",
+          "steps": [
+            {
+              "key": "KeyF",
+              "mods": [
+                "alt",
+                "shift"
+              ]
+            }
+          ],
+          "note": "Run the configured formatter over the whole file."
+        }
       ]
     },
     {
@@ -140,25 +396,108 @@
       "folder": "Dialpad/VS Code",
       "description": "Files, panels, and dials for moving between editors and zooming.",
       "buttons": [
-        { "title": "New File", "glyph": "+", "color": "#1B7F3B", "steps": [{ "key": "KeyN", "mods": ["cmd"] }], "note": "" },
-        { "title": "Close Tab", "glyph": "✕", "color": "#B3261E", "steps": [{ "key": "KeyW", "mods": ["cmd"] }], "note": "" },
-        { "title": "Toggle Sidebar", "glyph": "◧", "color": "#2A2E35", "steps": [{ "key": "KeyB", "mods": ["cmd"] }], "note": "" },
-        { "title": "Problems", "glyph": "⚠", "color": "#B26A00", "steps": [{ "key": "KeyM", "mods": ["cmd", "shift"] }], "note": "Errors and warnings panel." }
+        {
+          "title": "New File",
+          "glyph": "+",
+          "color": "#1B7F3B",
+          "steps": [
+            {
+              "key": "KeyN",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "Close Tab",
+          "glyph": "✕",
+          "color": "#B3261E",
+          "steps": [
+            {
+              "key": "KeyW",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "Toggle Sidebar",
+          "glyph": "◧",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "KeyB",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "Problems",
+          "glyph": "⚠",
+          "color": "#B26A00",
+          "steps": [
+            {
+              "key": "KeyM",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": "Errors and warnings panel."
+        }
       ],
       "dials": [
         {
-          "title": "Editors",
-          "color": "#1E4E8C",
-          "left": [{ "key": "ArrowLeft", "mods": ["cmd", "alt"] }],
-          "right": [{ "key": "ArrowRight", "mods": ["cmd", "alt"] }],
-          "note": "Step through open editors."
-        },
-        {
           "title": "Zoom",
           "color": "#2A2E35",
-          "left": [{ "key": "Minus", "mods": ["cmd"] }],
-          "right": [{ "key": "Equals", "mods": ["cmd"] }],
+          "left": [
+            {
+              "key": "Minus",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "right": [
+            {
+              "key": "Equals",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
           "note": "Editor font zoom."
+        },
+        {
+          "title": "Editors",
+          "color": "#1E4E8C",
+          "left": [
+            {
+              "key": "ArrowLeft",
+              "mods": [
+                "cmd",
+                "alt"
+              ]
+            }
+          ],
+          "right": [
+            {
+              "key": "ArrowRight",
+              "mods": [
+                "cmd",
+                "alt"
+              ]
+            }
+          ],
+          "note": "Step through open editors."
         }
       ]
     },
@@ -169,15 +508,129 @@
       "folder": "Console/Adobe Bridge",
       "description": "Photo triage: rate, reject, preview and rotate without leaving the keypad.",
       "buttons": [
-        { "title": "1 Star", "glyph": "★", "color": "#2A2E35", "steps": [{ "key": "Key1", "mods": ["cmd"] }], "note": "" },
-        { "title": "3 Star", "glyph": "★★★", "color": "#1E4E8C", "steps": [{ "key": "Key3", "mods": ["cmd"] }], "note": "" },
-        { "title": "5 Star", "glyph": "★★★★★", "color": "#B26A00", "steps": [{ "key": "Key5", "mods": ["cmd"] }], "note": "" },
-        { "title": "Reject", "glyph": "✕", "color": "#B3261E", "steps": [{ "key": "Delete", "mods": ["alt"] }], "note": "Marks as rejected rather than deleting." },
-        { "title": "No Rating", "glyph": "☆", "color": "#2A2E35", "steps": [{ "key": "Key0", "mods": ["cmd"] }], "note": "Clears the star rating." },
-        { "title": "Preview", "glyph": "■", "color": "#186A6A", "steps": [{ "key": "Space" }], "note": "Full-screen preview of the selected item." },
-        { "title": "Rotate CCW", "glyph": "↺", "color": "#2A2E35", "steps": [{ "key": "Oem4", "mods": ["cmd"] }], "note": "Rotates the thumbnail 90 degrees anticlockwise." },
-        { "title": "Camera Raw", "glyph": "◐", "color": "#5B3FA8", "steps": [{ "key": "KeyR", "mods": ["cmd"] }], "note": "Open the selection in Camera Raw." },
-        { "title": "Rotate CW", "glyph": "↻", "color": "#2A2E35", "steps": [{ "key": "Oem6", "mods": ["cmd"] }], "note": "Rotates the thumbnail 90 degrees clockwise." }
+        {
+          "title": "1 Star",
+          "glyph": "★",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "Key1",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "3 Star",
+          "glyph": "★★★",
+          "color": "#1E4E8C",
+          "steps": [
+            {
+              "key": "Key3",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "5 Star",
+          "glyph": "★★★★★",
+          "color": "#B26A00",
+          "steps": [
+            {
+              "key": "Key5",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "Reject",
+          "glyph": "✕",
+          "color": "#B3261E",
+          "steps": [
+            {
+              "key": "Delete",
+              "mods": [
+                "alt"
+              ]
+            }
+          ],
+          "note": "Marks as rejected rather than deleting."
+        },
+        {
+          "title": "No Rating",
+          "glyph": "☆",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "Key0",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Clears the star rating."
+        },
+        {
+          "title": "Preview",
+          "glyph": "■",
+          "color": "#186A6A",
+          "steps": [
+            {
+              "key": "Space"
+            }
+          ],
+          "note": "Full-screen preview of the selected item."
+        },
+        {
+          "title": "Rotate CCW",
+          "glyph": "↺",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "Oem4",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Rotates the thumbnail 90 degrees anticlockwise."
+        },
+        {
+          "title": "Camera Raw",
+          "glyph": "◐",
+          "color": "#5B3FA8",
+          "steps": [
+            {
+              "key": "KeyR",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Open the selection in Camera Raw."
+        },
+        {
+          "title": "Rotate CW",
+          "glyph": "↻",
+          "color": "#2A2E35",
+          "steps": [
+            {
+              "key": "Oem6",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Rotates the thumbnail 90 degrees clockwise."
+        }
       ]
     },
     {
@@ -187,25 +640,101 @@
       "folder": "Dialpad/Adobe Bridge",
       "description": "Library management, plus dials for browsing and thumbnail size.",
       "buttons": [
-        { "title": "Review Mode", "glyph": "◱", "color": "#5B3FA8", "steps": [{ "key": "KeyB", "mods": ["cmd"] }], "note": "Carousel review of the selection." },
-        { "title": "Batch Rename", "glyph": "✎", "color": "#B26A00", "steps": [{ "key": "KeyR", "mods": ["cmd", "shift"] }], "note": "" },
-        { "title": "New Folder", "glyph": "▱", "color": "#1B7F3B", "steps": [{ "key": "KeyN", "mods": ["cmd", "shift"] }], "note": "" },
-        { "title": "Find", "glyph": "⌕", "color": "#1E4E8C", "steps": [{ "key": "KeyF", "mods": ["cmd"] }], "note": "" }
+        {
+          "title": "Review Mode",
+          "glyph": "◱",
+          "color": "#5B3FA8",
+          "steps": [
+            {
+              "key": "KeyB",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": "Carousel review of the selection."
+        },
+        {
+          "title": "Batch Rename",
+          "glyph": "✎",
+          "color": "#B26A00",
+          "steps": [
+            {
+              "key": "KeyR",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "New Folder",
+          "glyph": "▱",
+          "color": "#1B7F3B",
+          "steps": [
+            {
+              "key": "KeyN",
+              "mods": [
+                "cmd",
+                "shift"
+              ]
+            }
+          ],
+          "note": ""
+        },
+        {
+          "title": "Find",
+          "glyph": "⌕",
+          "color": "#1E4E8C",
+          "steps": [
+            {
+              "key": "KeyF",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "note": ""
+        }
       ],
       "dials": [
         {
-          "title": "Browse",
-          "color": "#2A2E35",
-          "left": [{ "key": "ArrowLeft" }],
-          "right": [{ "key": "ArrowRight" }],
-          "note": "Step through the current folder."
-        },
-        {
           "title": "Thumb Size",
           "color": "#2A2E35",
-          "left": [{ "key": "Minus", "mods": ["cmd"] }],
-          "right": [{ "key": "Equals", "mods": ["cmd"] }],
+          "left": [
+            {
+              "key": "Minus",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
+          "right": [
+            {
+              "key": "Equals",
+              "mods": [
+                "cmd"
+              ]
+            }
+          ],
           "note": "Grow or shrink the thumbnail grid."
+        },
+        {
+          "title": "Browse",
+          "color": "#2A2E35",
+          "left": [
+            {
+              "key": "ArrowLeft"
+            }
+          ],
+          "right": [
+            {
+              "key": "ArrowRight"
+            }
+          ],
+          "note": "Step through the current folder."
         }
       ]
     }
