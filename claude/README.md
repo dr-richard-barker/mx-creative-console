@@ -53,7 +53,13 @@ never sees a half-written record.
 
 The installer merges into your existing `~/.claude/settings.json`, backs it up
 first, and strips any previously installed MX entries before adding new ones, so
-running it repeatedly will not pile up duplicates.
+running it repeatedly will not pile up duplicates. Other hooks and settings are
+left alone.
+
+It also symlinks the focus helper to `~/.claude/mx-console/focus-claude.sh`. That
+fixed path is where the plugin looks for it, so the plugin does not need to know
+where this repository lives. Because it is a symlink, edits to the script in the
+repo take effect immediately.
 
 | Hook event | State written |
 |---|---|

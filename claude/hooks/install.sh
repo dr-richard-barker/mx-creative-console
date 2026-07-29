@@ -28,6 +28,25 @@ command -v python3 >/dev/null || { echo "python3 is required" >&2; exit 1; }
 chmod +x "${REPO_DIR}/claude/hooks/mx_claude_state.py" \
          "${REPO_DIR}/claude/scripts/focus-claude.sh" 2>/dev/null || true
 
+# The Claude Console plugin looks for the focus helper at a fixed well-known
+# path so it does not need to know where this repository lives. Link it there
+# (a symlink so repo edits take effect immediately; copy if linking fails).
+STATE_DIR="${HOME}/.claude/mx-console"
+LINK="${STATE_DIR}/focus-claude.sh"
+SRC="${REPO_DIR}/claude/scripts/focus-claude.sh"
+
+if [[ "${MODE}" == "uninstall" ]]; then
+  [[ -L "${LINK}" || -f "${LINK}" ]] && rm -f "${LINK}" && echo "removed ${LINK}"
+elif [[ "${MODE}" != "print" ]]; then
+  mkdir -p "${STATE_DIR}"
+  if ln -sfn "${SRC}" "${LINK}" 2>/dev/null || cp -f "${SRC}" "${LINK}" 2>/dev/null; then
+    chmod +x "${LINK}" 2>/dev/null || true
+    echo "linked focus helper at ${LINK}"
+  else
+    echo "warning: could not install focus helper at ${LINK}" >&2
+  fi
+fi
+
 python3 - "${SETTINGS}" "${REPO_DIR}" "${MODE}" <<'PY'
 import json, os, shutil, sys, time
 

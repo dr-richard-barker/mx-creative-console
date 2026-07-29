@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Claude Console plugin for the Logi Actions SDK (Loupedeck plugin API).
+
+    NOTE ON THE SDK REFERENCE:
+    There is no public NuGet package for the Logi Actions SDK. Plugins reference
+    PluginApi.dll directly out of the installed Logi Plugin Service, exactly as the
+    official Logitech/actions-sdk DemoPlugin and the CodexBarUsage sample do.
+    See README.md for the doc links.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Loupedeck.ClaudeConsolePlugin</RootNamespace>
+    <AssemblyName>ClaudeConsolePlugin</AssemblyName>
+
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <!-- CA1416: we guard every platform-specific call at runtime ourselves. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- Where PluginApi.dll lives once Logi Options+ / Logi Plugin Service is installed. -->
+    <PluginApiDir Condition="$(OS) == 'Windows_NT'">C:\Program Files\Logi\LogiPluginService\</PluginApiDir>
+    <PluginApiDir Condition="$(OS) != 'Windows_NT'">/Applications/Utilities/LogiPluginService.app/Contents/MonoBundle/</PluginApiDir>
+
+    <!-- Where the sideload .link file goes. -->
+    <PluginDir Condition="$(OS) == 'Windows_NT'">$(LocalAppData)\Logi\LogiPluginService\Plugins\</PluginDir>
+    <PluginDir Condition="$(OS) != 'Windows_NT'">$(HOME)/Library/Application Support/Logi/LogiPluginService/Plugins/</PluginDir>
+
+    <!-- <plugin>/bin/<Configuration>/ -->
+    <BaseOutputPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../bin/'))</BaseOutputPath>
+    <OutputPath>$(BaseOutputPath)$(Configuration)/</OutputPath>
+
+    <!-- Must match `name:` in package/metadata/LoupedeckPackage.yaml (used by the reload URL). -->
+    <PluginShortName>ClaudeConsolePlugin</PluginShortName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="obj\**\*.cs" />
+    <Compile Remove="..\bin\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PluginApi">
+      <HintPath>$(PluginApiDir)PluginApi.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="VerifyPluginApi" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(PluginApiDir)PluginApi.dll')"
+           Text="PluginApi.dll not found at '$(PluginApiDir)'. Install Logi Options+ (which installs the Logi Plugin Service) before building." />
+  </Target>
+
+  <!-- Copy metadata/, actionicons/, etc. next to the built DLL. `pluginFolderMac: .` in the
+       yaml means the DLL sits in the same directory the .link points at. -->
+  <Target Name="CopyPackage" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <PackageFiles Include="package\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(OutputPath)%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Message Text="Package files copied to $(OutputPath)" Importance="High" />
+  </Target>
+
+  <!-- Sideload: drop a .link file whose only content is the path of the build output. -->
+  <Target Name="PostBuild" AfterTargets="CopyPackage">
+    <MakeDir Directories="$(PluginDir)" />
+    <WriteLinesToFile File="$(PluginDir)$(PluginShortName).link" Lines="$(OutputPath)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <Message Text="Created plugin link: $(PluginDir)$(PluginShortName).link -> $(OutputPath)" Importance="High" />
+
+    <Exec Condition="$(OS) == 'Windows_NT'" Command="start loupedeck:plugin/$(PluginShortName)/reload" ContinueOnError="true" />
+    <Exec Condition="$(OS) != 'Windows_NT'" Command="open loupedeck:plugin/$(PluginShortName)/reload" ContinueOnError="true" />
+    <Message Condition="'$(MSBuildLastTaskResult)' == 'false'"
+             Text="Could not auto-reload the plugin. Quit Logi Options+ and the Logi Plugin Service, then relaunch." Importance="High" />
+  </Target>
+
+  <Target Name="PluginClean" AfterTargets="CoreClean">
+    <Delete Files="$(PluginDir)$(PluginShortName).link" />
+    <RemoveDir Directories="$(BaseOutputPath)" />
+  </Target>
+
+</Project>

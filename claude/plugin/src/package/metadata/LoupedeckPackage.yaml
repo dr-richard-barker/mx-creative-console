@@ -1,0 +1,67 @@
+# ==================================================================================================
+# Claude Console — Logi Actions SDK plugin package manifest
+#
+# Field set and values follow the official Logitech/actions-sdk DemoPlugin manifest and the
+# shipped Logitech first-party plugin manifests under
+#   ~/Library/Application Support/Logi/LogiPluginService/Plugins/<Plugin>/metadata/
+#
+# GENERAL SETTINGS
+# ==================================================================================================
+
+# Package type. Must be plugin4 for plugins.
+type: plugin4
+
+# Identifier for the plugin. Must match <PluginShortName> in ClaudeConsolePlugin.csproj,
+# because it is what the `loupedeck:plugin/<name>/reload` URL addresses.
+name: ClaudeConsolePlugin
+
+# Name shown to the user in Logi Options+.
+displayName: Claude Console
+
+# Short description of the plugin.
+description: Flashes a key when Claude Code needs your input, and answers it with one press.
+
+# Name of the built plugin assembly.
+pluginFileName: ClaudeConsolePlugin.dll
+
+# Plugin version.
+version: 1.0
+
+# Author of the plugin.
+author: Richard Barker
+
+# Copyright information.
+copyright: Copyright © 2026 Richard Barker.
+
+# Minimum SDK version supported by the plugin.
+minimumLoupedeckVersion: 6.0
+
+# Plugin icon shown in the Logi Options+ plugin list. 256x256 PNG in this directory.
+icon256x256: Icon256x256.png
+
+
+# ==================================================================================================
+# PLUGIN PROPERTIES
+# ==================================================================================================
+
+# Location of the plugin files relative to the directory the .link file points at.
+# The build drops the DLL and this metadata/ folder into the same directory, so both are ".".
+pluginFolderWin: .
+pluginFolderMac: .
+
+# Devices the plugin is optimized for.
+supportedDevices:
+    # Logitech MX Creative Console family (the keypad this plugin is built for).
+    - LoupedeckExtendedFamily
+
+    # Loupedeck CT / Live / Live S and the Razer Stream Controllers.
+    - LoupedeckCtFamily
+
+
+# ==================================================================================================
+# MARKETPLACE SETTINGS
+# ==================================================================================================
+
+license: MIT
+homePageUrl: https://github.com/dr-richard-barker/mx-creative-console
+supportPageUrl: https://github.com/dr-richard-barker/mx-creative-console/issues
