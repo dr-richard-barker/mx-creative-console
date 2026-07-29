@@ -52,11 +52,14 @@ TERMINALS = {
     "kitty": ("kitty", "net.kovidgoyal.kitty"),
 }
 
-# Bundle ids that identify a VS Code fork more precisely than TERM_PROGRAM does.
+# Bundle ids worth recognising by themselves. The VS Code forks all report
+# TERM_PROGRAM=vscode, so only the bundle id tells them apart; the desktop apps
+# set no TERM_PROGRAM at all, so without this their sessions record no app name.
 BUNDLE_OVERRIDES = {
     "com.todesktop.230313mzl4w4u92": ("Cursor", "com.todesktop.230313mzl4w4u92"),
     "com.exafunction.windsurf": ("Windsurf", "com.exafunction.windsurf"),
     "dev.zed.Zed": ("Zed", "dev.zed.Zed"),
+    "com.anthropic.claudefordesktop": ("Claude", "com.anthropic.claudefordesktop"),
 }
 
 

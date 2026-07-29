@@ -21,8 +21,11 @@ if [[ ! -f "${STATE_FILE}" ]]; then
   exit 1
 fi
 
-# Tab-separated so app names containing spaces survive.
-IFS=$'\t' read -r BUNDLE_ID APP_NAME STATE <<<"$(
+# Unit-separator delimited, not tab: tab is an IFS *whitespace* character, so
+# bash collapses runs of them and an empty field (a null "app", which is what
+# you get when TERM_PROGRAM is unset) would silently shift every later field
+# along by one. \x1f is not whitespace, so empty fields survive.
+IFS=$'\x1f' read -r BUNDLE_ID APP_NAME STATE <<<"$(
   python3 - "${STATE_FILE}" <<'PY'
 import json, sys
 try:
@@ -30,8 +33,8 @@ try:
         d = json.load(fh)
 except Exception:
     d = {}
-print("\t".join([d.get("bundle_id") or "", d.get("app") or "",
-                 d.get("state") or "unknown"]))
+print("\x1f".join([d.get("bundle_id") or "", d.get("app") or "",
+                   d.get("state") or "unknown"]))
 PY
 )"
 
