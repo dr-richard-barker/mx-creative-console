@@ -182,11 +182,19 @@ python3 tools/lp5kit/verify.py --all      # structural self-check</code></pre>
   </p>
 
   <div class="note">
-    <strong>Still unverified:</strong> whether Logi Options+ accepts a profile that was
-    generated from scratch rather than round-tripped through its own exporter. The
-    structure matches and the self-check is clean, but no import has been confirmed on
-    real hardware. If one fails to import, please open an issue with what Options+ said.
+    <strong>Confirmed:</strong> Logi Options+ imports these files. The Claude Code keypad
+    profile, generated from scratch rather than round-tripped through Options+'s own
+    exporter, imported successfully on real hardware on 29 July 2026. That was the
+    format's one load-bearing assumption.
   </div>
+
+  <p>
+    What that does <em>not</em> prove is that every key fires the right keystroke once
+    pressed &mdash; importing shows the file deserialises, not that each encoding lands
+    correctly on the host. Since the encodings are byte-identical to ones Options+ wrote
+    itself, that is a far weaker assumption. If a key misbehaves, please open an issue
+    saying which one.
+  </p>
 </section>
 
 </main>

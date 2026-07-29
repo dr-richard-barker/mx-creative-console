@@ -223,13 +223,21 @@ order:
 `area` is in a 100&times;100 coordinate space, independent of the key's real
 pixel size.
 
+## Confirmed on real hardware
+
+**Logi Options+ imports a from-scratch generated profile.** The Claude Code
+keypad profile built by `lp5kit` imported successfully on 2026-07-29. This was
+the format's one load-bearing assumption &mdash; the `$type` annotations imply
+strict .NET deserialisation that could have rejected something subtle, and it
+did not. Everything documented above is therefore accepted by the real importer,
+not merely consistent with exported files.
+
 ## What is still unverified
 
-- **Whether Options+ imports a from-scratch profile.** Every structural
-  invariant matches and `verify.py` passes on generated and original files
-  alike, but no import onto real hardware has been confirmed. The `$type`
-  annotations imply strict .NET deserialisation that could reject something
-  subtle.
+- **That every key fires the right keystroke when pressed.** Import succeeding
+  proves the file deserialises; it does not prove each encoded keystroke lands
+  correctly on the host. The encodings are byte-identical to real exports, so
+  this is a much weaker assumption than the import was.
 - **`packageName` / `packageVersion`.** Generated fresh each build. Whether
   Options+ attaches meaning to them is unknown.
 - **Multiple pages per workspace** (`@ChangeTouchPage`) and `folderPages`.

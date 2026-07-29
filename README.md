@@ -80,10 +80,15 @@ guesswork.
 generators produce byte-identical keystroke strings, and those strings match ones
 read out of real exports character for character.
 
-What has **not** been confirmed is an actual import into Logi Options+ on real
-hardware. The structure matches everything observable, but no one has yet watched
-one of these files load. If an import fails, please open an issue with whatever
-Options+ reported.
+And **Logi Options+ imports them.** The Claude Code keypad profile was imported
+successfully on real hardware on 29 July 2026 &mdash; generated from scratch, not
+round-tripped through Options+'s own exporter. That was the format's one
+load-bearing assumption, and it holds.
+
+What that does not yet prove is that every key fires the right keystroke when
+pressed; importing shows the file deserialises correctly. Since the encodings are
+byte-identical to ones Options+ wrote itself, that is a much weaker assumption.
+If a key misbehaves, open an issue saying which one.
 
 ---
 
