@@ -749,7 +749,20 @@ def write_lp5(profile: Profile, out_path: str, app_icon: str | None = None) -> s
 
     os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
 
-    with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        # ZIP stores a DOS timestamp per member and zipfile defaults it to
+        # "now", so otherwise-identical rebuilds differ. Pin it. (DOS time has
+        # 2-second resolution, which makes this easy to miss - two builds in
+        # the same 2-second window look reproducible when they are not.)
+        class _z:
+            @staticmethod
+            def writestr(name, data):
+                info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                info.external_attr = 0o644 << 16
+                zf.writestr(info, data)
+
+        z = _z
         z.writestr("ProfileInfo.json", json.dumps(info, indent=4))
         z.writestr("ApplicationInfo.json", json.dumps(app_info, indent=4))
         z.writestr("metadata/AdvancedInfo.json",
