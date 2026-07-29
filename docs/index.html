@@ -49,8 +49,11 @@
 <section id="builder">
   <h2>Build your own</h2>
   <p>
-    Pick a device, click a key, give it a label and a keystroke. The file is assembled
-    in your browser &mdash; nothing is uploaded anywhere.
+    Pick a device, click a control, give it a label and a keystroke. On the dialpad the
+    two dials are editable too &mdash; each takes a separate action for turning
+    anticlockwise, turning clockwise, and pressing. Any action can be a keystroke, a
+    string of typed text, or several of them in sequence. The file is assembled in your
+    browser &mdash; nothing is uploaded anywhere.
   </p>
 
   <div class="toolbar">
@@ -72,6 +75,7 @@
   <div class="builder">
     <div>
       <div id="device-grid" class="grid-keypad"></div>
+      <div id="dial-row" class="dials"></div>
       <p style="font-size:12.5px;color:var(--muted);margin-top:10px" id="grid-hint"></p>
     </div>
     <div class="controls" id="editor"></div>
@@ -200,6 +204,19 @@ python3 tools/lp5kit/verify.py --all      # structural self-check</code></pre>
 </main>
 
 <footer class="wrap">
+  <!--
+    Tip jar. To activate it, replace YOUR-VENMO-USERNAME below with your Venmo
+    handle (the one in your profile URL, without the @). That is the only edit
+    needed - the link is plain, so there is nothing to configure or embed.
+    Deleting this whole <p class="tip"> block removes the tip jar entirely.
+  -->
+  <p class="tip">
+    These profiles and the generator are free, and stay free. If they saved you an
+    afternoon of fiddling, you can
+    <a href="https://venmo.com/u/YOUR-VENMO-USERNAME" rel="noopener noreferrer">leave a tip on Venmo</a>
+    &mdash; any amount, entirely optional, and nothing here works differently either way.
+    <span class="tip-note">Venmo is US-only, so apologies if it is no use where you are.</span>
+  </p>
   <p>
     Forked from <a href="https://github.com/jamesjingyi/mx-creative-console">jamesjingyi/mx-creative-console</a>.
     Source for this page and the generator:

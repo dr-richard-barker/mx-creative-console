@@ -22,7 +22,13 @@ $("#theme-toggle").addEventListener("click", () => {
 
 /* ---------------- data ---------------- */
 
-const state = { specs: null, spec: null, selected: 0, locale: "en-GB" };
+const state = {
+  specs: null,
+  spec: null,
+  // Which control the editor is pointing at: a press button or a dial.
+  selected: { kind: "button", i: 0 },
+  locale: "en-GB",
+};
 
 const MOD_LIST = [
   ["cmd", "Cmd"],
@@ -165,6 +171,13 @@ function initBuilder() {
   renderBuilder();
 }
 
+function blankButton() {
+  return { title: "", glyph: "", color: "#2A2E35", steps: [], note: "" };
+}
+function blankDial() {
+  return { title: "", color: "#2A2E35", left: [], right: [], press: [], note: "" };
+}
+
 function loadPreset(value) {
   if (value.startsWith("blank")) {
     const device = value.endsWith("dialpad") ? "dialpad" : "keypad";
@@ -173,91 +186,174 @@ function loadPreset(value) {
       name: "My Profile",
       device,
       description: "",
-      buttons: Array.from({ length: dev.press }, () => ({
-        title: "", glyph: "", color: "#2A2E35", steps: [], note: "",
-      })),
-      dials: Array.from({ length: dev.rotate }, () => ({
-        title: "", color: "#2A2E35", left: [], right: [], press: [], note: "",
-      })),
+      buttons: Array.from({ length: dev.press }, blankButton),
+      dials: Array.from({ length: dev.rotate }, blankDial),
     };
   } else {
     state.spec = clone(state.specs.profiles[Number(value)]);
-    const dev = DEVICES[state.spec.device];
-    state.spec.buttons = state.spec.buttons || [];
-    while (state.spec.buttons.length < dev.press) {
-      state.spec.buttons.push({ title: "", glyph: "", color: "#2A2E35", steps: [] });
-    }
   }
-  state.selected = 0;
+
+  // Presets only define the controls they use; pad so every physical control
+  // on the device is editable, including unassigned ones.
+  const dev = DEVICES[state.spec.device];
+  state.spec.buttons = state.spec.buttons || [];
+  state.spec.dials = state.spec.dials || [];
+  while (state.spec.buttons.length < dev.press) state.spec.buttons.push(blankButton());
+  while (state.spec.dials.length < dev.rotate) state.spec.dials.push(blankDial());
+
+  state.selected = { kind: "button", i: 0 };
+}
+
+/* ---- selection ---- */
+
+const isSelected = (kind, i) =>
+  state.selected.kind === kind && state.selected.i === i;
+
+function select(kind, i) {
+  state.selected = { kind, i };
+  renderBuilder();
+}
+
+const activateOnKey = (fn) => (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    fn();
+  }
+};
+
+function buttonNode(i) {
+  const node = keyFace(state.spec.buttons[i], { placeholder: String(i + 1) });
+  node.setAttribute("role", "button");
+  node.tabIndex = 0;
+  node.setAttribute("aria-current", String(isSelected("button", i)));
+  const pick = () => select("button", i);
+  node.addEventListener("click", pick);
+  node.addEventListener("keydown", activateOnKey(pick));
+  return node;
+}
+
+function dialNode(i) {
+  const d = state.spec.dials[i];
+  const bound = !!(d && (d.left?.length || d.right?.length || d.press?.length));
+  const node = el("div", { className: bound ? "dial" : "dial empty" });
+  if (bound && d.color) node.style.borderColor = d.color;
+  node.append(el("span", { className: "dial-title" }, d?.title || `Dial ${i + 1}`));
+  node.append(el("span", { className: "dial-sub" }, bound ? "↺  ↻" : "unassigned"));
+  node.setAttribute("role", "button");
+  node.tabIndex = 0;
+  node.setAttribute("aria-current", String(isSelected("dial", i)));
+  const pick = () => select("dial", i);
+  node.addEventListener("click", pick);
+  node.addEventListener("keydown", activateOnKey(pick));
+  return node;
 }
 
 function renderBuilder() {
-  const grid = $("#device-grid");
   const dev = DEVICES[state.spec.device];
+
+  const grid = $("#device-grid");
   grid.className = state.spec.device === "dialpad" ? "grid-dialpad" : "grid-keypad";
   grid.replaceChildren();
+  for (let i = 0; i < dev.press; i++) grid.append(buttonNode(i));
 
-  for (let i = 0; i < dev.press; i++) {
-    const b = state.spec.buttons[i];
-    const face = keyFace(b, { placeholder: String(i) });
-    face.setAttribute("role", "button");
-    face.tabIndex = 0;
-    face.setAttribute("aria-current", String(i === state.selected));
-    const pick = () => { state.selected = i; renderBuilder(); };
-    face.addEventListener("click", pick);
-    face.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
-    });
-    grid.append(face);
-  }
+  const dialHost = $("#dial-row");
+  dialHost.replaceChildren();
+  dialHost.style.display = dev.rotate ? "flex" : "none";
+  for (let i = 0; i < dev.rotate; i++) dialHost.append(dialNode(i));
 
-  $("#grid-hint").textContent =
-    state.spec.device === "dialpad"
-      ? "4 buttons. Dial actions are kept from the preset and included in the download."
-      : "9 keys, top-left to bottom-right. Click one to edit it.";
+  $("#grid-hint").textContent = dev.rotate
+    ? `${dev.press} buttons and ${dev.rotate} dials. Click any of them to edit.`
+    : `${dev.press} keys, top-left to bottom-right. Click one to edit it.`;
 
   renderEditor();
 }
 
+/* Repaint the device only, so the editor keeps focus while you type. */
+function refreshFaces() {
+  const dev = DEVICES[state.spec.device];
+  const grid = [...$("#device-grid").children];
+  grid.forEach((node, i) => { if (i < dev.press) node.replaceWith(buttonNode(i)); });
+  const dials = [...$("#dial-row").children];
+  dials.forEach((node, i) => { if (i < dev.rotate) node.replaceWith(dialNode(i)); });
+}
+
+/* ---- editor ---- */
+
 function renderEditor() {
   const host = $("#editor");
-  const b = state.spec.buttons[state.selected];
   host.replaceChildren();
-
-  host.append(
-    field("Profile name", inputText(state.spec.name, (v) => {
-      state.spec.name = v;
-    })),
-  );
-
-  host.append(el("h3", { style: "margin:6px 0 0" }, `Key ${state.selected + 1}`));
-
-  host.append(field("Label", inputText(b.title, (v) => {
-    b.title = v; refreshFace();
+  host.append(field("Profile name", inputText(state.spec.name, (v) => {
+    state.spec.name = v;
   })));
 
-  const glyphRow = el("div", { className: "row-inline" });
-  const glyphInput = inputText(b.glyph || "", (v) => { b.glyph = v; refreshFace(); });
+  if (state.selected.kind === "dial") renderDialEditor(host);
+  else renderButtonEditor(host);
+}
+
+function renderButtonEditor(host) {
+  const b = state.spec.buttons[state.selected.i];
+
+  host.append(el("h3", { style: "margin:6px 0 0" }, `Key ${state.selected.i + 1}`));
+  host.append(field("Label", inputText(b.title, (v) => {
+    b.title = v; refreshFaces();
+  })));
+
+  const faceRow = el("div", { className: "row-inline" });
+  const glyphInput = inputText(b.glyph || "", (v) => { b.glyph = v; refreshFaces(); });
   glyphInput.style.maxWidth = "90px";
   glyphInput.placeholder = "◉";
   const colorInput = el("input", { type: "color", value: normaliseHex(b.color) });
-  colorInput.addEventListener("input", () => { b.color = colorInput.value; refreshFace(); });
-  glyphRow.append(glyphInput, colorInput,
+  colorInput.addEventListener("input", () => { b.color = colorInput.value; refreshFaces(); });
+  faceRow.append(glyphInput, colorInput,
     el("span", { style: "font-size:12.5px;color:var(--muted)" }, "glyph and colour"));
-  host.append(field("Face", glyphRow));
+  host.append(field("Face", faceRow));
 
-  host.append(field("Actions", stepsEditor(b)));
-
+  host.append(field("Actions", stepsEditor(b, "steps")));
   if (b.note) {
     host.append(el("p", { style: "font-size:13px;color:var(--muted);margin:0" }, b.note));
   }
+  const enc = encodedPreview(b.steps);
+  if (enc) host.append(enc);
+}
 
-  const encoded = (b.steps || [])
-    .map((s) => (s.text !== undefined
-      ? `type: ${s.text}`
-      : safeEncode(s)))
+const DIAL_SLOTS = [
+  ["left", "Turn anticlockwise"],
+  ["right", "Turn clockwise"],
+  ["press", "Press"],
+];
+
+function renderDialEditor(host) {
+  const d = state.spec.dials[state.selected.i];
+
+  host.append(el("h3", { style: "margin:6px 0 0" }, `Dial ${state.selected.i + 1}`));
+  host.append(field("Label", inputText(d.title, (v) => {
+    d.title = v; refreshFaces();
+  })));
+
+  const colorInput = el("input", { type: "color", value: normaliseHex(d.color) });
+  colorInput.addEventListener("input", () => { d.color = colorInput.value; refreshFaces(); });
+  host.append(field("Colour", colorInput));
+
+  for (const [key, label] of DIAL_SLOTS) {
+    d[key] = d[key] || [];
+    const slot = el("div", { className: "slot" });
+    slot.append(el("h4", {}, label));
+    slot.append(stepsEditor(d, key));
+    const enc = encodedPreview(d[key]);
+    if (enc) slot.append(enc);
+    host.append(slot);
+  }
+
+  if (d.note) {
+    host.append(el("p", { style: "font-size:13px;color:var(--muted);margin:0" }, d.note));
+  }
+}
+
+function encodedPreview(steps) {
+  const text = (steps || [])
+    .map((s) => (s.text !== undefined ? `type: ${s.text}` : safeEncode(s)))
     .join("\n");
-  if (encoded) host.append(el("div", { className: "encoded" }, encoded));
+  return text ? el("div", { className: "encoded" }, text) : null;
 }
 
 function safeEncode(step) {
@@ -268,11 +364,16 @@ function safeEncode(step) {
   }
 }
 
-function stepsEditor(button) {
+/**
+ * Editor for one ordered list of steps. `owner[key]` is the array, so this
+ * serves both a button's `steps` and a dial's left/right/press slots.
+ */
+function stepsEditor(owner, key) {
   const wrap = el("div", { className: "steps" });
-  button.steps = button.steps || [];
+  owner[key] = owner[key] || [];
+  const steps = owner[key];
 
-  button.steps.forEach((step, idx) => {
+  steps.forEach((step, idx) => {
     const row = el("div", { className: "step" });
     const body = el("div", { className: "step-body" });
 
@@ -291,18 +392,18 @@ function stepsEditor(button) {
       body.append(inputText(step.text, (v) => { step.text = v; renderEditor(); },
         "/compact"));
     } else {
-      const select = el("select");
+      const select_ = el("select");
       for (const [group, keys] of Object.entries(KEY_GROUPS)) {
         const og = el("optgroup", { label: group });
         for (const k of keys) {
           og.append(el("option", { value: k },
             KEY_PRETTY[k] || (/^Key[A-Z0-9]$/.test(k) ? k.slice(3) : k)));
         }
-        select.append(og);
+        select_.append(og);
       }
-      select.value = step.key || "Return";
-      select.addEventListener("change", () => { step.key = select.value; renderEditor(); });
-      body.append(select);
+      select_.value = step.key || "Return";
+      select_.addEventListener("change", () => { step.key = select_.value; renderEditor(); });
+      body.append(select_);
 
       const mods = el("div", { className: "mods" });
       step.mods = step.mods || [];
@@ -322,8 +423,8 @@ function stepsEditor(button) {
     row.append(body);
     const del = el("button", { type: "button", title: "Remove this step" }, "✕");
     del.addEventListener("click", () => {
-      button.steps.splice(idx, 1);
-      refreshFace();
+      steps.splice(idx, 1);
+      refreshFaces();
       renderEditor();
     });
     row.append(del);
@@ -333,32 +434,17 @@ function stepsEditor(button) {
   const add = el("div", { className: "row-inline" });
   const addKey = el("button", { type: "button" }, "+ keystroke");
   addKey.addEventListener("click", () => {
-    button.steps.push({ key: "Return", mods: [] });
-    refreshFace(); renderEditor();
+    steps.push({ key: "Return", mods: [] });
+    refreshFaces(); renderEditor();
   });
   const addText = el("button", { type: "button" }, "+ text");
   addText.addEventListener("click", () => {
-    button.steps.push({ text: "" });
-    refreshFace(); renderEditor();
+    steps.push({ text: "" });
+    refreshFaces(); renderEditor();
   });
   add.append(addKey, addText);
   wrap.append(add);
   return wrap;
-}
-
-/* Repaint just the device grid, keeping the editor's focus intact. */
-function refreshFace() {
-  const grid = $("#device-grid");
-  const dev = DEVICES[state.spec.device];
-  [...grid.children].forEach((node, i) => {
-    if (i >= dev.press) return;
-    const fresh = keyFace(state.spec.buttons[i], { placeholder: String(i) });
-    fresh.setAttribute("role", "button");
-    fresh.tabIndex = 0;
-    fresh.setAttribute("aria-current", String(i === state.selected));
-    fresh.addEventListener("click", () => { state.selected = i; renderBuilder(); });
-    node.replaceWith(fresh);
-  });
 }
 
 /* ---------------- small helpers ---------------- */

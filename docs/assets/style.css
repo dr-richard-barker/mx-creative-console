@@ -172,5 +172,30 @@ th { font-weight: 600; font-size: 12.5px; color: var(--muted); text-transform: u
 .scroll-x { overflow-x: auto; }
 
 footer { padding: 32px 0 60px; color: var(--muted); font-size: 14px; }
+footer .tip { max-width: 64ch; margin: 0 0 18px; }
+footer .tip-note { display: block; margin-top: 4px; font-size: 12.5px; opacity: .75; }
+
+/* ---- dial editor ---- */
+
+.dials { display: flex; gap: 10px; margin-top: 12px; }
+.dial {
+  flex: 1; border-radius: 999px; aspect-ratio: 1; border: 2px solid var(--line);
+  background: var(--panel); color: var(--fg); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px; cursor: pointer;
+  text-align: center; padding: 6px; font-family: inherit; outline: 2px solid transparent;
+  outline-offset: 2px; transition: outline-color .12s;
+}
+.dial:hover { outline-color: var(--muted); }
+.dial[aria-current="true"] { outline-color: var(--accent); }
+.dial .dial-title { font-size: 10.5px; font-weight: 600; line-height: 1.15; word-break: break-word; }
+.dial .dial-sub { font-size: 9px; opacity: .7; font-family: var(--mono); }
+.dial.empty { border-style: dashed; color: var(--muted); }
+
+.slot { border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.slot > h4 {
+  margin: 0 0 8px; font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .04em;
+}
+.slot + .slot { margin-top: 10px; }
 
 .theme-toggle { position: fixed; top: 14px; right: 14px; z-index: 10; padding: 6px 10px; font-size: 13px; }
