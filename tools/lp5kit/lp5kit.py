@@ -16,10 +16,10 @@ See ``FORMAT.md`` in this directory for the full reverse-engineered schema.
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
-import uuid
 import zipfile
 from dataclasses import dataclass, field
 from typing import Iterable
@@ -306,16 +306,38 @@ class Profile:
 # --------------------------------------------------------------------------
 
 
-def _guid() -> str:
-    return uuid.uuid4().hex.upper()
+_STEP_ALPHABET = (
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+)
 
 
-def _short_id(n: int = 21) -> str:
-    """Nanoid-ish identifier, matching the style Options+ uses for macro steps."""
-    import random
-    import string
-    alphabet = string.ascii_letters + string.digits + "-_"
-    return "".join(random.choice(alphabet) for _ in range(n))
+class _IdSource:
+    """Deterministic id generator.
+
+    Options+ uses random GUIDs, and any unique value works. Deriving them from
+    the profile instead means rebuilding an unchanged spec produces a
+    byte-identical file, so `build_profiles.py` does not dirty the working tree
+    on every run and a real diff means a real change.
+    """
+
+    def __init__(self, seed: str):
+        self._seed = seed
+        self._n = 0
+
+    def _digest(self) -> str:
+        self._n += 1
+        payload = f"{self._seed}:{self._n}".encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
+    def guid(self) -> str:
+        return self._digest()[:32].upper()
+
+    def step(self, n: int = 21) -> str:
+        digest = self._digest()
+        return "".join(
+            _STEP_ALPHABET[int(digest[i * 2:i * 2 + 2], 16) % len(_STEP_ALPHABET)]
+            for i in range(n)
+        )
 
 
 class ProfileBuilder:
@@ -327,12 +349,13 @@ class ProfileBuilder:
         self.macro_commands: list[dict] = []
         self.macro_adjustments: list[dict] = []
         self.icons: dict[str, tuple] = {}   # actionName -> (title, icon, color, text_color)
-        self.profile_guid = _guid()
+        self.ids = _IdSource(f"{profile.name}|{profile.device}|{profile.mode}")
+        self.profile_guid = self.ids.guid()
 
     # -- action emitters ---------------------------------------------------
 
     def _add_single_key(self, step: Key, title: str) -> str:
-        action_name = f"$@Generic___@ProfileAction___{_guid()}"
+        action_name = f"$@Generic___@ProfileAction___{self.ids.guid()}"
         self.profile_actions.append({
             "$type": T_CMD,
             "isCommand": True,
@@ -369,7 +392,7 @@ class ProfileBuilder:
             if isinstance(step, Text):
                 actions.append(f"$@Generic___@TypeText___{step.value}")
             elif isinstance(step, Key):
-                step_id = _short_id()
+                step_id = self.ids.step()
                 editor.append({
                     "$type": T_MACRO_STEP,
                     "name": step_id,
@@ -385,7 +408,7 @@ class ProfileBuilder:
         return editor, actions
 
     def _add_macro(self, steps: list, title: str) -> str:
-        guid = _guid()
+        guid = self.ids.guid()
         editor, actions = self._compile_steps(steps)
         self.macro_commands.append({
             "$type": T_MACRO,
@@ -405,7 +428,7 @@ class ProfileBuilder:
         return f"$@Generic___@Macro___{guid}"
 
     def _add_adjustment(self, dial: Dial) -> str:
-        guid = _guid()
+        guid = self.ids.guid()
         editor: list[dict] = []
         compiled: dict[str, list[str]] = {}
         for slot, steps in (("actionsLeft", dial.left),
@@ -489,19 +512,19 @@ class ProfileBuilder:
 
         workspace = {
             "$type": T_WORKSPACE,
-            "name": _guid(),
+            "name": self.ids.guid(),
             "displayName": "Workspace 1",
             "description": "",
             "pressPages": [{
                 "$type": T_PAGE,
-                "name": _guid(),
+                "name": self.ids.guid(),
                 "displayName": "Page (1)",
                 "description": "",
                 "controls": press_controls,
             }],
             "rotatePages": ([{
                 "$type": T_PAGE,
-                "name": _guid(),
+                "name": self.ids.guid(),
                 "displayName": "Dial Page",
                 "description": "",
                 "controls": rotate_controls,
@@ -547,7 +570,7 @@ class ProfileBuilder:
             "profileCommands": [],
             "profileAdjustments": [],
             "conversionHistory": None,
-            "packageName": _guid(),
+            "packageName": self.ids.guid(),
             "packageVersion": p.version,
             "profileActions": self.profile_actions,
         }
