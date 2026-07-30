@@ -510,7 +510,7 @@
       "buttons": [
         {
           "title": "1 Star",
-          "glyph": "★",
+          "glyph": "1★",
           "color": "#2A2E35",
           "steps": [
             {
@@ -524,7 +524,7 @@
         },
         {
           "title": "3 Star",
-          "glyph": "★★★",
+          "glyph": "3★",
           "color": "#1E4E8C",
           "steps": [
             {
@@ -538,7 +538,7 @@
         },
         {
           "title": "5 Star",
-          "glyph": "★★★★★",
+          "glyph": "5★",
           "color": "#B26A00",
           "steps": [
             {
